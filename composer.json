@@ -1,0 +1,20 @@
+{
+    "name": "enbolt/emt",
+    "description": "enbolt mysql tool",
+    "authors": [
+        {
+            "name": "bagadamehul",
+            "email": "bagadamehul615@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {},
+    "autoload": {
+        "classmap": [
+            ....
+        ],
+        "psr-4": {
+            "Enbolt\\Emt\\": "src/"
+        }
+    },
+}
