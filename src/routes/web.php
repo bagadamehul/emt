@@ -1,7 +1,7 @@
 <?php
 
 Route::get('/bg-test', 'Enbolt\Emt\Http\Controllers\BGController@index');
-
+ 
 Route::group(['namespace' => 'Enbolt\Emt\Http\Controllers'], function () {
 	Route::get('/emt/index', 'EmtController@index')->name('emt.index');
 	Route::post('/emt/run', 'EmtController@run')->name('emt.run');
