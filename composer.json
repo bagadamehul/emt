@@ -11,7 +11,7 @@
     "require": {},
     "autoload": {
         "classmap": [
-            ....
+            
         ],
         "psr-4": {
             "Enbolt\\Emt\\": "src/"
