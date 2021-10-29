@@ -9,7 +9,6 @@
     ],
     "type":"Library",
     "license":"MIT",
-    "minimum-stability": "dev",
     "prefer-stable": true,
     "require": {},
     "autoload": {
