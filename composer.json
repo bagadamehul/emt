@@ -7,6 +7,8 @@
             "email": "bagadamehul615@gmail.com"
         }
     ],
+    "type":"Library",
+    "license":"MIT",
     "minimum-stability": "stable",
     "require": {},
     "autoload": {
