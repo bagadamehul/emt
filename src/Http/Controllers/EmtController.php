@@ -139,11 +139,9 @@ class EmtController extends Controller {
 	public function Approval(Request $request) {
 		view()->share('pageTitle', 'Query Approval');
 		$DCs = \DB::table("location_code")->orderBy("dc")->pluck("dc", "dc")->toArray();
-		$agents = \DB::table("agents")->select('name', 'id', 'cm_id')->where("deleted", "0")->get();
+		
 		$o = [];
-		foreach ($agents as $key => $value) {
-			$o[$value->cm_id][$value->id] = $value->name;
-		}
+		
 		return view($this->moduleTitleP . '.approval_list', compact('DCs'))->with('agents', $o);
 	}
 	public function getApproval(Request $request) {
