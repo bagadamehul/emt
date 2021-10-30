@@ -9,6 +9,7 @@
     ],
     "type":"Library",
     "license":"MIT",
+    "prefer-stable": true,
     "require": {},
     "autoload": {
         "psr-4": {
