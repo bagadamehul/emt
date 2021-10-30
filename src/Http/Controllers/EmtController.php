@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class EmtController extends Controller {
 	public $_QRcodeFolderPath = "/app/public/google-auth-qr-codes/";
 	public function __construct() {
+		view()->share('AdminTheme','layouts.appAdmin');
 		$this->moduleTitleS = 'Admin';
 		$this->moduleTitleP = 'Theme.Admin.emt';
 		$this->ApprovalPrequel = new ApprovalPrequel;
