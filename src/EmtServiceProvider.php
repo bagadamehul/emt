@@ -28,7 +28,6 @@ class EmtServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->make('Enbolt\Emt\Http\Controllers\BGController');
         $this->app->make('Enbolt\Emt\Http\Controllers\EmtController');
     }
 }
