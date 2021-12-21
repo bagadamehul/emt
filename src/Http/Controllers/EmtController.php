@@ -27,7 +27,11 @@ class EmtController extends Controller {
 		$tablesList = DB::select('SHOW TABLES');
 		view()->share('pageTitle', 'Administrator');
 		view()->share("pageMetaTitle", "Administrator");
-
+		if (auth()->check() || auth()->guard('admin')->check()) {
+			return view($this->moduleTitleP . '.index',compact('tablesList'));
+		}else{
+			return redirect('/');
+		}
 		return view($this->moduleTitleP . '.index',compact('tablesList'));
 	}
 
