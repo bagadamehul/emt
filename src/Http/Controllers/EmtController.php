@@ -27,11 +27,7 @@ class EmtController extends Controller {
 		$tablesList = DB::select('SHOW TABLES');
 		view()->share('pageTitle', 'Administrator');
 		view()->share("pageMetaTitle", "Administrator");
-		if (auth()->check() || auth()->guard('admin')->check()) {
-			return view($this->moduleTitleP . '.index',compact('tablesList'));
-		}else{
-			return redirect('/');
-		}
+
 		return view($this->moduleTitleP . '.index',compact('tablesList'));
 	}
 
@@ -105,22 +101,34 @@ class EmtController extends Controller {
 				DB::statement($qry);
 				$data = $type . " successfully";
 			}
+			$is_approval_prequel = 	DB::table('approval_prequel')
+										->where('qry',$qry)
+										->where('type',$type)
+										->where('user_id', auth()->user()->id)
+										->where('status','1')
+										->where('qry_count','0')
+										->first();
+			if ($is_approval_prequel) {
+				DB::statement($qry);
+				$data = $type . " successfully";
+				DB::table('approval_prequel')->where('id',$is_approval_prequel->id)->update(['qry_count'=>1]);
+			}else{
+				$approval_prequel = DB::table('approval_prequel')->insertGetId(
+					[
+						'user_id' => $user->id,
+						'qry' => $qry,
+						'status' => $status,
+						'type' => $type,
+						'created_at' => date('Y-m-d H:i:s'),
+					]
+				);
+				if ($status == 0) {
+					// send mail for approval
 
-			$approval_prequel = DB::table('approval_prequel')->insertGetId(
-				[
-					'user_id' => $user->id,
-					'qry' => $qry,
-					'status' => $status,
-					'type' => $type,
-					'created_at' => date('Y-m-d H:i:s'),
-				]
-			);
-
-			if ($status == 0) {
-				// send mail for approval
-
-				$data = $type . " sent for approval";
+					$data = $type . " sent for approval";
+				}
 			}
+
 
 			if ($format == 'Json') {
 				$data = json_encode($data, JSON_PRETTY_PRINT);
@@ -181,7 +189,7 @@ class EmtController extends Controller {
 				} else {
 					return '<a class="approval-record" data-toggle="modal" data-target="#delivery-boy-approval-modal" cm_id="' . $data->id . '" data-url="' . \URL::route('approval-system.emt-status', [$data->id, 1]) . '" href="#"><i class="ti-check"></i></a>
                             <span style="font-size: 20px">|</span>
-                        <a class="reject-record" data-toggle="modal" data-target="#reject-bank-modal" data-url="' . \URL::route('approval-system.prequel-status', [$data->id, 2]) . '" href="#"><i class="ti-close" style="color: red;"></i></a>';
+                        <a class="reject-record" data-toggle="modal" data-target="#reject-bank-modal" data-url="' . \URL::route('approval-system.emt-status', [$data->id, 2]) . '" href="#"><i class="ti-close" style="color: red;"></i></a>';
 				}
 			})
 			->setRowClass(function ($data) {
@@ -215,9 +223,9 @@ class EmtController extends Controller {
 					'approved_at' => date('Y-m-d H:i:s'),
 				]);
 
-				$qry = $ApprovalPrequel->qry;
+				// $qry = $ApprovalPrequel->qry;
 
-				DB::statement($qry);
+				// DB::statement($qry);
 
 				notificationMsg('success', 'Query approved successfully');
 				return redirect(route('approval-system.emt-approval'));

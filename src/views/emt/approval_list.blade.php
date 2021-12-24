@@ -1,4 +1,4 @@
-@extends($AdminTheme)
+@extends('layouts.appAdmin')
 @section('style')
 <style type="text/css">
     /*.tomato-bg {
