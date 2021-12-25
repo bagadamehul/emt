@@ -24,6 +24,9 @@ class EmtController extends Controller {
 	 * @return \Illuminate\Http\Response
 	 */
 	public function index(Request $request) {
+		if (!auth()->user()) {
+			return redirect('/');
+		}
 		$tablesList = DB::select('SHOW TABLES');
 		view()->share('pageTitle', 'Administrator');
 		view()->share("pageMetaTitle", "Administrator");
@@ -148,6 +151,9 @@ class EmtController extends Controller {
 	}
 
 	public function Approval(Request $request) {
+		if (!auth()->user()) {
+			return redirect('/');
+		}
 		view()->share('pageTitle', 'Query Approval');
 		$DCs = \DB::table("location_code")->orderBy("dc")->pluck("dc", "dc")->toArray();
 		$agents = \DB::table("agents")->select('name', 'id', 'cm_id')->where("deleted", "0")->get();
