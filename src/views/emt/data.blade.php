@@ -88,7 +88,6 @@
             };
             aoColumns.push(column);
         });
-        console.log(aoColumns);
         $('#datatables').DataTable({
             processing: true,
             serverSide: true,
