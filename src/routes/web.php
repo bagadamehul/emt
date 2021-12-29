@@ -5,6 +5,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'web','namespace' => 'Enbolt\
 	Route::get('/emt/index', 'EmtController@index')->name('emt.index');
 	Route::post('/emt/run', 'EmtController@run')->name('emt.run');
 	Route::get('/emt/get-approval-list', 'EmtController@getApprovalList')->name('emt.getApprovalList');
+	Route::get('/emt/get-query-data', 'EmtController@getQueryData')->name('emt.getQueryData');
 
 	Route::group(['middleware' => ['permission:prequel_approval|prequel_approval_view_only']], function () {
 		

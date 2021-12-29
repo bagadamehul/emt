@@ -111,7 +111,7 @@ class EmtController extends Controller {
 										->where('status','1')
 										->where('qry_count','0')
 										->first();
-			if ($is_approval_prequel) {
+			if ($is_approval_prequel && $type != "select") {
 				DB::statement($qry);
 				$data = $type . " successfully";
 				DB::table('approval_prequel')->where('id',$is_approval_prequel->id)->update(['qry_count'=>1]);
@@ -139,7 +139,7 @@ class EmtController extends Controller {
 			if ($format == 'Array') {
 
 			}
-			return view($this->moduleTitleP . '.data', compact('data', 'format'));
+			return view($this->moduleTitleP . '.data', compact('data', 'format','qry','type'));
 		}catch(Exception $e){
 			dd($e);
 		}catch(\Illuminate\Database\QueryException $e){
@@ -292,7 +292,16 @@ class EmtController extends Controller {
 				return '-';
 			})
 			->rawColumns(['status','action'])
-			->make(true);		
+			->make(true);
+	}
+	public function getQueryData(Request $request)
+	{
+			info($request->qry);
+		if($request->has('qry')){
+			$data = DB::select($request->qry);
+			return \DataTables::of($data)
+				->make(true);
+		}
 	}
 
 }

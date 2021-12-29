@@ -197,13 +197,13 @@
                   @endif
               </span>
             </div>
-            <div class="form-group">
+            {{--<div class="form-group">
               <label for="comment">format:</label>
               <select class="form-control" name="format" id="format">
                   <option value="Array">Array</option>
                   <option value="Json">Json</option>
               </select>      
-            </div>
+            </div>--}}
             <div class="form-group">
               <button type="submit" name="submit" value="SUBMIT" class="btn btn-default">Execute</button>
               <button type="submit" name="submit" value="DOWNLOAD" class="btn btn-default">Download</button>
