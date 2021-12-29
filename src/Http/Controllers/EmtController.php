@@ -296,7 +296,6 @@ class EmtController extends Controller {
 	}
 	public function getQueryData(Request $request)
 	{
-			info($request->qry);
 		if($request->has('qry')){
 			$data = DB::select($request->qry);
 			return \DataTables::of($data)
