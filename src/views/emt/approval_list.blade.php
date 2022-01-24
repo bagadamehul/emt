@@ -53,7 +53,7 @@
         <div class="row">
             <div class="col-md-12 text-left">
                 <div class=" col-md-6" style="padding-bottom: 10PX;">                            
-                    <select name="status" class="downloadtrigger form-control" id="status-filter" onchange="$('#datatables').DataTable().draw()" style="display:inline; width:20%;">
+                    <select name="status" class="downloadtrigger form-control" id="status-filter" onchange="$('#datatables').DataTable().draw()" style="display:inline; width:30%;">
                         <option value="">All</option>
                         <option selected value="0">Pending</option>
                         <option value="1">Approved</option>
@@ -251,7 +251,7 @@
             dom: "Blfrtip",
            buttons: [{
                            extend: "excel",
-                           text: '<i title="Extract below data" class="fas fa-file-export"></i>',
+                           text: '<i title="Extract below data" class="fa fa-download"></i> Export',
                            className: "btn-class",
                            title: "{{ $pageTitle }}",
                            exportOptions: {

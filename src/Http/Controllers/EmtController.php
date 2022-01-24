@@ -72,6 +72,53 @@ class EmtController extends Controller {
 						fclose($file);
 					}, 200, $headers);
 				}
+				if ($request->submit == "DOWNLOADSQL") {
+					$name = 'reports.sql';
+					$headers = [
+						'Content-Disposition' => 'attachment; filename=' . $name,
+					];
+
+					$structure = '';
+			        $insertQuery = '';
+			        preg_match('/\bfrom\b\s*(\w+)/i',$qry,$matches);
+			        $table=$matches[1];
+			        $show_table_query = "SHOW CREATE TABLE " . $table . "";
+
+			        $show_table_result = DB::select(DB::raw($show_table_query));
+
+			        foreach ($show_table_result as $show_table_row) {
+			            $show_table_row = (array)$show_table_row;
+			            $structure .= "\n\n" . $show_table_row["Create Table"] . ";\n\n";
+			        }
+			        foreach ($data as $record) {
+			            $record = (array)$record;
+			            $table_column_array = array_keys($record);
+			            foreach ($table_column_array as $key => $name) {
+			                $table_column_array[$key] = '`' . $table_column_array[$key] . '`';
+			            }
+
+			            $table_value_array = array_values($record);
+			            $insertQuery .= "\nINSERT INTO $table (";
+
+			            $insertQuery .= "" . implode(", ", $table_column_array) . ") VALUES \n";
+
+			            foreach($table_value_array as $key => $record_column)
+			                $table_value_array[$key] = addslashes($record_column);
+
+			            $insertQuery .= "('" . implode("','", $table_value_array) . "');\n";
+			        }
+			        $name = 'reports.sql';
+			        $headers = [
+			            'Content-Disposition' => 'attachment; filename=' . $name,
+			        ];
+			        return response()->stream(function () use ($insertQuery,$structure) {
+			            $file_handle = fopen('php://output', 'w + ');
+
+			            $output = $structure . $insertQuery;
+			            fwrite($file_handle, $output);
+			            fclose($file_handle);
+			        }, 200, $headers);
+				}
 			}
 			if (strtolower($first) == "update") {
 				// update
@@ -258,6 +305,11 @@ class EmtController extends Controller {
 
 	}
 
+	/**
+	 * Write code on Method
+	 *
+	 * @return response()
+	 */
 	public function getApprovalList(Request $request)
 	{
 		$filters = [];
@@ -294,13 +346,76 @@ class EmtController extends Controller {
 			->rawColumns(['status','action'])
 			->make(true);
 	}
+
+	/**
+	 * Write code on Method
+	 *
+	 * @return response()
+	 */
 	public function getQueryData(Request $request)
 	{
 		if($request->has('qry')){
-			$data = DB::select($request->qry);
+			$qry = $request->qry;
+			if (($request->has('column') && !empty($request->value)) || (trim($request->op) == 'IS NULL' || trim($request->op) == 'IS NOT NULL')) {
+				if ($request->op == 'LIKE %%') {
+					$qry = $qry.' WHERE '.$request->column.' LIKE '.'"%'.$request->value.'%"';
+				}else if ($request->op == 'IN' || $request->op == 'NOT IN') {
+					$qry = $qry.' WHERE '.$request->column.' '.$request->op.' ('.$request->value.')';
+				}else if (trim($request->op) == 'IS NULL' || trim($request->op) == 'IS NOT NULL') {
+					$qry = $qry.' WHERE '.$request->column.' '.$request->op;
+				}else{
+					$qry = $qry.' WHERE '.$request->column.' '.$request->op.' "'.$request->value.'"';
+				}
+			}
+			$data = DB::select($qry);
+			view()->share('qry', $qry);
 			return \DataTables::of($data)
 				->make(true);
 		}
 	}
 
+	public function mySqlStatistics()
+	{
+		// $q = DB::select("show processlist;");
+		// $q = DB::select("SHOW ENGINE INNODB STATUS;");
+		// $q = DB::select("SHOW FULL PROCESSLIST;");
+
+		// Buffer Size
+		// $q = DB::select("SHOW VARIABLES LIKE '%buffer%';");
+		
+		// Query Size
+		// $q = DB::select("SHOW VARIABLES LIKE '%query%';");
+
+		// memory alloc
+		// dd($q);
+		$q = DB::select("SELECT SUBSTRING_INDEX(event_name,'/',2) AS
+       code_area, SUM(current_alloc)
+       AS current_alloc
+       FROM sys.memory_global_by_current_bytes
+       GROUP BY SUBSTRING_INDEX(event_name,'/',2)
+       ORDER BY SUM(current_alloc) DESC;");
+		// $res = DB::select("SELECT * FROM sys.memory_global_by_current_bytes");
+		// dd($res);
+		// Total Memory DB Storage
+// 		$q = DB::select('SELECT ( @@key_buffer_size
+// + @@query_cache_size
+// + @@innodb_buffer_pool_size
+// + @@innodb_log_buffer_size
+// + @@max_connections * ( 
+//     @@read_buffer_size
+//     + @@read_rnd_buffer_size
+//     + @@sort_buffer_size
+//     + @@join_buffer_size
+//     + @@binlog_cache_size
+//     + @@thread_stack
+//     + @@tmp_table_size )
+// ) / (1024 * 1024 * 1024) AS MAX_MEMORY_GB;');
+
+		$res = DB::select("SELECT *
+       FROM sys.memory_global_by_current_bytes
+       GROUP BY SUBSTRING_INDEX(event_name,'/',2)
+       ORDER BY SUM(current_alloc) DESC");
+		dd($res);
+		return view($this->moduleTitleP.'.mySqlStatistics');
+	}
 }
